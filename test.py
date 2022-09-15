@@ -1,14 +1,14 @@
-"""This module is used to test the GNCNN model."""
+"""This module is used to test the YeNet model."""
 from glob import glob
 import torch
 import numpy as np
 import imageio as io
-from model import GNCNN
+from model import YeNet
 
 TEST_BATCH_SIZE = 40
 COVER_PATH = "/path/to/cover/images/"
 STEGO_PATH = "/path/to/stego/images/"
-CHKPT = "./checkpoints/GNCNN_model_weights.pt"
+CHKPT = "./checkpoints/YeNet_model_weights.pt"
 
 cover_image_names = glob(COVER_PATH)
 stego_image_names = glob(STEGO_PATH)
@@ -16,7 +16,7 @@ stego_image_names = glob(STEGO_PATH)
 cover_labels = np.zeros((len(cover_image_names)))
 stego_labels = np.ones((len(stego_image_names)))
 
-model = GNCNN().cuda()
+model = YeNet().cuda()
 
 ckpt = torch.load(CHKPT)
 model.load_state_dict(ckpt["model_state_dict"])
@@ -52,7 +52,11 @@ for idx in range(0, len(cover_image_names), TEST_BATCH_SIZE // 2):
     outputs = model(image_tensor)
     prediction = outputs.data.max(1)[1]
 
-    accuracy = prediction.eq(batch_labels.data).sum() * 100.0 / (batch_labels.size()[0])
+    accuracy = (
+        prediction.eq(batch_labels.data).sum()
+        * 100.0
+        / (batch_labels.size()[0])
+    )
     test_accuracy.append(accuracy.item())
 
 print(f"test_accuracy = {sum(test_accuracy)/len(test_accuracy):%.2f}")

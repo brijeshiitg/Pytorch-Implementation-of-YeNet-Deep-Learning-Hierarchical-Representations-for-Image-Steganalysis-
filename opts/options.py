@@ -8,21 +8,19 @@ def arguments() -> str:
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--cover_path",
-        default="D:\\Github\\Toy-Bossbase-dataset\\bossbase_toy_dataset\\train\\cover",
+        default="D:\\bossbase\\train\\cover",
     )
     parser.add_argument(
         "--stego_path",
-        default="D:\\Github\\Toy-Bossbase-dataset\\bossbase_toy_dataset\\train\\stego",
+        default="D:\\bossbase\\train\\stego",
     )
     parser.add_argument(
         "--valid_cover_path",
-        default="D:\\Github\\Toy-Bossbase-dataset\\bossbase_toy_dataset\\valid\\cover",
+        default="D:\\bossbase\\valid\\cover",
     )
     parser.add_argument(
         "--valid_stego_path",
-        default=(
-            "D:\\Github\\Toy-Bossbase-dataset\\bossbase_toy_dataset\\valid\\stego"
-        ),
+        default="D:\\bossbase\\valid\\stego",
     )
     parser.add_argument("--checkpoints_dir", default="./checkpoints/")
     parser.add_argument("--batch_size", type=int, default=10)

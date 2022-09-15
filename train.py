@@ -1,4 +1,4 @@
-"""This module is use to train the GNCNN model."""
+"""This module is use to train the YeNet model."""
 
 import logging
 import os
@@ -12,7 +12,7 @@ from torchvision import transforms
 
 from dataset import dataset
 from opts.options import arguments
-from model.model import GNCNN
+from model.model import YeNet
 from utils.utils import (
     latest_checkpoint,
     adjust_learning_rate,
@@ -54,11 +54,15 @@ if __name__ == "__main__":
     )
 
     # Creating training and validation loader.
-    train_loader = DataLoader(train_data, batch_size=opt.batch_size, shuffle=True)
-    valid_loader = DataLoader(val_data, batch_size=opt.batch_size, shuffle=False)
+    train_loader = DataLoader(
+        train_data, batch_size=opt.batch_size, shuffle=True
+    )
+    valid_loader = DataLoader(
+        val_data, batch_size=opt.batch_size, shuffle=False
+    )
 
     # model creation and initialization.
-    model = GNCNN()
+    model = YeNet()
     model.to(device)
     model = model.apply(weights_init)
 
@@ -101,7 +105,9 @@ if __name__ == "__main__":
 
         for i, train_batch in enumerate(train_loader):
             images = torch.cat((train_batch["cover"], train_batch["stego"]), 0)
-            labels = torch.cat((train_batch["label"][0], train_batch["label"][1]), 0)
+            labels = torch.cat(
+                (train_batch["label"][0], train_batch["label"][1]), 0
+            )
             images = images.to(device, dtype=torch.float)
             labels = labels.to(device, dtype=torch.long)
             optimizer.zero_grad()
@@ -112,7 +118,9 @@ if __name__ == "__main__":
             optimizer.step()
             training_loss.append(loss.item())
             prediction = outputs.data.max(1)[1]
-            accuracy = prediction.eq(labels.data).sum() * 100.0 / (labels.size()[0])
+            accuracy = (
+                prediction.eq(labels.data).sum() * 100.0 / (labels.size()[0])
+            )
             training_accuracy.append(accuracy.item())
 
             sys.stdout.write(
@@ -131,7 +139,9 @@ if __name__ == "__main__":
 
             for i, val_batch in enumerate(valid_loader):
                 images = torch.cat((val_batch["cover"], val_batch["stego"]), 0)
-                labels = torch.cat((val_batch["label"][0], val_batch["label"][1]), 0)
+                labels = torch.cat(
+                    (val_batch["label"][0], val_batch["label"][1]), 0
+                )
 
                 images = images.to(device, dtype=torch.float)
                 labels = labels.to(device, dtype=torch.long)
@@ -141,7 +151,11 @@ if __name__ == "__main__":
                 loss = loss_fn(outputs, labels)
                 validation_loss.append(loss.item())
                 prediction = outputs.data.max(1)[1]
-                accuracy = prediction.eq(labels.data).sum() * 100.0 / (labels.size()[0])
+                accuracy = (
+                    prediction.eq(labels.data).sum()
+                    * 100.0
+                    / (labels.size()[0])
+                )
                 validation_accuracy.append(accuracy.item())
 
         avg_train_loss = sum(training_loss) / len(training_loss)
@@ -166,7 +180,8 @@ if __name__ == "__main__":
             "train_loss": sum(training_loss) / len(training_loss),
             "valid_loss": sum(validation_loss) / len(validation_loss),
             "train_accuracy": sum(training_accuracy) / len(training_accuracy),
-            "valid_accuracy": sum(validation_accuracy) / len(validation_accuracy),
+            "valid_accuracy": sum(validation_accuracy)
+            / len(validation_accuracy),
             "model_state_dict": model.state_dict(),
             "optimizer_state_dict": optimizer.state_dict(),
             "lr": optimizer.param_groups[0]["lr"],
